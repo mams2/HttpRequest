@@ -32,10 +32,10 @@ public class MainActivity extends Activity {
         task.execute();
     }
 
-    public class GetTask extends AsyncTask <String, Void, String> {
+    public class GetTask extends AsyncTask <String, Void, RespostaServidor> {
         private Exception exception;
 
-        protected String doInBackground(String... urls) {
+        protected RespostaServidor doInBackground(String... urls) {
             try {
                 return get("http://api.openweathermap.org/data/2.5/find?lat=-9.0&lon=-35&cnt=15&APPID=fb83342443d6727211b36da403438b02");
             } catch (Exception e) {
@@ -44,18 +44,22 @@ public class MainActivity extends Activity {
             }
         }
 
-        protected void onPostExecute(String getResponse) {
-            System.out.println(getResponse);
+        protected void onPostExecute(RespostaServidor resposta) {
+            System.out.println(resposta.cities.get(0).name);
+            System.out.println(resposta.cities.get(14).weather.get(0).description);
+            System.out.println(resposta.cities.get(0).temperature.temp_min);
+            System.out.println(resposta.cities.get(0).temperature.temp_max);
             System.out.println("acabou");
         }
 
-        public String get(String url) throws IOException {
+        public RespostaServidor get(String url) throws IOException {
             Request request = new Request.Builder()
                     .url(url)
                     .build();
 
             Response response = client.newCall(request).execute();
-            return response.body().string();
+            RespostaServidor resposta = gson.fromJson(response.body().charStream(), RespostaServidor.class);
+            return resposta;
         }
     }
 }
